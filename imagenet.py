@@ -195,11 +195,9 @@ class CNN(nn.Module):
         x = self.alex.classifier(x)
         x = self.fc_plus(x)
         code = hash_layer(x)
-        # x = F.tanh(x)
-        binary_out = self.fc(code)
-        #binary_out = self.fc(x)
+        output = self.fc(code)
 
-        return binary_out, x, code
+        return output, x, code
 
 
 cnn = CNN(encode_length=encode_length, num_classes=num_classes)
@@ -229,8 +227,8 @@ for epoch in range(num_epochs):
 
         # Forward + Backward + Optimize
         optimizer.zero_grad()
-        binary_out, feature, _ = cnn(images)
-        loss1 = criterion(binary_out, labels)
+        outputs, feature, _ = cnn(images)
+        loss1 = criterion(outputs, labels)
         #loss2 = F.mse_loss(torch.abs(feature), Variable(torch.ones(feature.size()).cuda()))
         loss2 = torch.mean(torch.abs(torch.pow(torch.abs(feature) - Variable(torch.ones(feature.size()).cuda()), 3)))
         loss = loss1 + 1 * loss2
